@@ -1,0 +1,127 @@
+package com.gchandra.mytest;
+
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
+
+import com.gchandra.mytest.databinding.FragmentMyDetail2Binding;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
+
+
+public class MyDetailFragment2 extends Fragment {
+    private FragmentMyDetail2Binding binding;
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+ 
+    public MyDetailFragment2() {
+        // Required empty public constructor
+    }
+
+
+    public static MyDetailFragment2 newInstance(String param1, String param2) {
+        MyDetailFragment2 fragment = new MyDetailFragment2();
+        Bundle args = new Bundle();
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        binding = FragmentMyDetail2Binding.inflate(inflater, container, false);
+
+        return binding.getRoot();
+
+    }
+
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        binding.buttonPreviousMy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NavHostFragment.findNavController(MyDetailFragment2.this)
+                        .navigate(R.id.action_myDetailFragment2_to_nav_users);
+
+            }
+        });
+        getDocument();
+        Log.d("3A", "end of onViewCreated  ");
+    }
+
+    public void getDocument() {
+        // [START get_document]
+        DocumentReference docRef = db.collection("users").document("one");
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d("3A", "DocumentSnapshot data: " + document.getData());
+                        String mName = document.getString("name");
+                        Log.d("3A", "check " + mName);
+                        binding.textViewNameMy.setText(mName);
+                    } else {
+                        Log.d("3A", "No such document");
+                    }
+                } else {
+                    Log.d("3A", "get failed with ", task.getException());
+                }
+
+            }
+        });
+        // [END get_document]
+    }
+
+    public void getDocumentWithOptions() {
+        // [START get_document_options]
+        DocumentReference docRef = db.collection("users").document("nameone");
+
+        // Source can be CACHE, SERVER, or DEFAULT.
+        Source source = Source.CACHE;
+
+        // Get the document, forcing the SDK to use the offline cache
+        docRef.get(source).addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    // Document found in the offline cache
+                    DocumentSnapshot document = task.getResult();
+                    Log.d("3A", "Cached document data: " + document.getData());
+                    User1 user1 = document.toObject(User1.class);
+                    Log.d("3A", "Cached user1: " + user1.getname());
+
+                } else {
+                    Log.d("3A", "Cached get failed: ", task.getException());
+                }
+            }
+        });
+        // [END get_document_options]
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
+
+}

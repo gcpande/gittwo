@@ -1,0 +1,135 @@
+package com.gchandra.mytest;
+
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
+
+import com.gchandra.mytest.databinding.FragmentMyDetailBinding;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+
+public class MyDetailFragment extends Fragment {
+    private FragmentMyDetailBinding binding;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    DocumentReference docRef = db.collection("users").document("one");
+
+    public MyDetailFragment() {
+        // Required empty public constructor
+    }
+
+
+    public static MyDetailFragment newInstance(String param1, String param2) {
+        MyDetailFragment fragment = new MyDetailFragment();
+        Bundle args = new Bundle();
+        fragment.setArguments(args);
+        return fragment;
+
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        binding = FragmentMyDetailBinding.inflate(inflater, container, false);    
+        //      readFirestoreData() ;
+		return binding.getRoot();
+    }
+
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        
+		// button to read data from firestore
+		 binding.buttonEditMy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                if (documentSnapshot.exists()) {
+                                    Log.d("3A", "document  exists   ");
+                                    Log.d("3A", "DocumentSnapshot data: " + documentSnapshot.getData());
+                                    Object id = documentSnapshot.get("id");
+                                    Log.i("3A", String.valueOf(FirebaseAuth.getInstance().getCurrentUser()));
+                                    String name = documentSnapshot.getString("name");
+                                    //    Map <String, Object> map = documentSnapshot.getData();
+                                    binding.textViewNameMy.setText(name);
+                                } else {
+                                    Log.d("3A", "document does not exist   ");
+                                }
+                                //                   userT = documentSnapshot.toObject(User1.class);
+                                //                   callback.onResponse(userT);
+                                Log.d("3A", "inside   foo   ");
+                                //                   Log.d("3A", "now see  " + userT.geteMail() );
+                            }
+                        })
+
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d("3A", "failed to fetch data   ");
+                            }
+                        });
+
+            }
+        });
+         // button for back action
+        binding.buttonPreviousMy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NavHostFragment.findNavController(MyDetailFragment.this)
+                        .navigate(R.id.action_myDetailFragment_to_nav_users);
+
+
+            }
+        });
+    }
+
+ 
+        public void readFirestoreData() {
+            DocumentReference docRef = db.collection("users").document("one");
+             docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if(documentSnapshot.exists()){
+                            Log.d("3A", "document  exists   ");
+                            binding.textViewNameMy.setText(documentSnapshot.getString("name"));
+                        }else {
+                            Log.d("3A", "document does not exist   ");
+                        }
+                     
+                    }
+                })
+    
+                     .addOnFailureListener(new OnFailureListener() {
+                         @Override
+                         public void onFailure(@NonNull Exception e) {
+                             Log.d("3A", "failed to fetch data   " );
+                         }
+                     });
+    
+        }
+   
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
+
+}

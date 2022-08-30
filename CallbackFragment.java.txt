@@ -1,0 +1,111 @@
+package com.gchandra.mytest;
+
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
+import com.gchandra.mytest.databinding.FragmentMyDetail2Binding;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+
+public class CallbackFragment extends Fragment {
+    private FragmentMyDetail2Binding binding;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    public CallbackFragment() {
+        // Required empty public constructor
+    }
+
+    public static CallbackFragment newInstance(String param1, String param2) {
+        CallbackFragment fragment = new CallbackFragment();
+        Bundle args = new Bundle();
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        binding = FragmentMyDetail2Binding.inflate(inflater, container, false);
+
+
+        return binding.getRoot();
+    }
+
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        getDocument(new Callback() {
+            @Override
+            public void myCallback(User1 user1) {
+                Log.d("3A", "check " + user1.getname());
+                // binding.textViewNameMy.setText(user1.getname());
+                Log.d("3A", "two ");
+            }
+
+        });
+
+        Log.d("3A", "end of onViewCreated  ");
+    }
+
+    public void getDocument(final Callback callback) {
+        // [START get_document]
+        DocumentReference docRef = db.collection("users").document("one");
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+
+                    //          User1    user1 =  document.toObject(User1.class);
+                    //               callback.myCallback(user1 );
+                    Log.d("3A", "one  ");
+
+                    //                   binding.textViewNameMy.setText(value);
+                    if (document.exists()) {
+                        Log.d("3A", "DocumentSnapshot data: " + document.getData());
+                        String name = document.getString("name");
+                        Log.d("3A", "check" + name);
+                        User1 user1 = document.toObject(User1.class);
+                        callback.myCallback(user1);
+                    } else {
+                        Log.d("3A", "No such document");
+                    }
+
+                } else {
+                    Log.d("3A", "get failed with ", task.getException());
+                }
+
+            }
+        });
+        // [END get_document]
+
+    }
+    //   public void giveMyData(final Callback callback ){
+
+    //   }
+    public interface Callback {
+        void myCallback(User1 user1);
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+}

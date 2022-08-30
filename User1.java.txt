@@ -1,0 +1,97 @@
+package com.gchandra.mytest;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class User1 {
+    static AtomicInteger atomicUserCount = new AtomicInteger(0);
+    private int id;
+    private String name;
+    private String address;
+    private String mobile;
+    private String eMail;
+
+    //Empty  constructor
+    public User1() {
+    }
+
+    public User1(String name, String address, String mobile, String eMail) {
+        this.id = atomicUserCount.incrementAndGet();
+        this.name = name;
+        this.address = address;
+        this.mobile = mobile;
+        this.eMail = eMail;
+
+    }
+
+
+    public int getid() {
+        return id;
+    }
+
+    public void setid(int id) {
+        this.id = id;
+    }
+
+    public String getname() {
+        return name;
+    }
+
+    public void setname(String name) {
+        this.name = name;
+    }
+
+    public String getaddress() {
+        return address;
+    }
+
+    public void setaddress(String address) {
+        this.address = address;
+    }
+
+    public String getmobile() {
+        return mobile;
+    }
+
+    public void setmobile(String mobile) {
+
+        this.mobile = mobile;
+    }
+
+    public String geteMail() {
+        return eMail;
+    }
+
+    public void seteeMail(String eMail) {
+        this.eMail = eMail;
+    }
+
+    boolean updatename(String name) {
+        this.name = name;      // it will update name of the that object
+        return true;         // just keep default true
+    }
+
+    boolean updateaddress(String address) {
+        this.address = address;
+        return true;
+    }
+
+    boolean updatemobile(String mobile) {
+        this.mobile = mobile;
+        return true;
+    }
+
+    boolean updateeMail(String eMail) {
+        this.eMail = eMail;
+        return true;
+    }
+
+    boolean updateProfile(String name, String address, String mobile, String eMail) {
+        this.name = name;
+        this.address = address;
+        this.mobile = mobile;
+        this.eMail = eMail;
+        return true;
+    }
+
+
+}
